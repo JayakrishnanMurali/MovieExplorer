@@ -9,6 +9,7 @@ import {
   Easing,
   FlatList,
   Image,
+  PanResponder,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -276,6 +277,39 @@ function GenreFilterSheet({
   selectedGenre: number;
   sheetAnim: Animated.Value;
 }) {
+  const dragY = React.useRef(new Animated.Value(0)).current;
+  const dragThreshold = 80;
+
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => gestureState.dy > 5,
+      onPanResponderMove: Animated.event([null, { dy: dragY }], {
+        useNativeDriver: false,
+      }),
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > dragThreshold) {
+          Animated.timing(sheetAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start(onClose);
+          dragY.setValue(0);
+        } else {
+          Animated.spring(dragY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(dragY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      },
+    })
+  ).current;
+
   if (!visible) return null;
   return (
     <Animated.View
@@ -284,16 +318,21 @@ function GenreFilterSheet({
         {
           transform: [
             {
-              translateY: sheetAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [400, 0],
-              }),
+              translateY: Animated.add(
+                sheetAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [480, 0],
+                }),
+                dragY
+              ),
             },
           ],
         },
       ]}
     >
-      <View style={styles.sheetHandle} />
+      <View style={styles.sheetHandleArea} {...panResponder.panHandlers}>
+        <View style={styles.sheetHandle} />
+      </View>
       <Text style={styles.modalTitle}>Select Genre</Text>
       <View style={styles.sheetListContainer}>
         <FlatList
@@ -511,5 +550,11 @@ const styles = StyleSheet.create({
   sheetListContainer: {
     maxHeight: 320,
     flex: 1,
+  },
+  sheetHandleArea: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    width: "100%",
   },
 });
