@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -8,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useMovieStore } from "../store/movieStore";
+import { endpoints } from "../store/movieStore";
 
 interface Movie {
   id: number;
@@ -23,27 +24,20 @@ interface Movie {
 
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams();
-  const { getMovieDetails } = useMovieStore();
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMovieDetails = async () => {
-      try {
-        const movieData = await getMovieDetails(Number(id));
-        setMovie(movieData);
-      } catch (err) {
-        setError("Failed to load movie details");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    data: movie,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["movie", id],
+    queryFn: async () => {
+      const response = await axios.get(endpoints.movieDetails(Number(id)));
+      return response.data;
+    },
+  });
 
-    fetchMovieDetails();
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" />
@@ -54,7 +48,9 @@ export default function MovieDetailScreen() {
   if (error || !movie) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>{error || "Movie not found"}</Text>
+        <Text style={styles.errorText}>
+          {error ? "Failed to load movie details" : "Movie not found"}
+        </Text>
       </View>
     );
   }
@@ -77,7 +73,7 @@ export default function MovieDetailScreen() {
           <Text style={styles.rating}>⭐ {movie.vote_average.toFixed(1)}</Text>
         </View>
         <View style={styles.genres}>
-          {movie.genres.map((genre) => (
+          {movie.genres.map((genre: { id: number; name: string }) => (
             <Text key={genre.id} style={styles.genre}>
               {genre.name}
             </Text>

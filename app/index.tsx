@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useMovieStore } from "./store/movieStore";
+import { endpoints, useMovieStore } from "./store/movieStore";
 
 interface Movie {
   id: number;
@@ -22,13 +23,18 @@ interface Movie {
 
 export default function MovieListScreen() {
   const router = useRouter();
-  const { movies, loading, error, fetchMovies } = useMovieStore();
+  const { setMovies } = useMovieStore();
 
-  useEffect(() => {
-    fetchMovies();
-  }, []);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["movies"],
+    queryFn: async () => {
+      const response = await axios.get(endpoints.popular);
+      setMovies(response.data.results);
+      return response.data.results;
+    },
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" />
@@ -39,7 +45,7 @@ export default function MovieListScreen() {
   if (error) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>Failed to load movies</Text>
       </View>
     );
   }
@@ -73,7 +79,7 @@ export default function MovieListScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={movies}
+        data={data}
         renderItem={renderMovieItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
