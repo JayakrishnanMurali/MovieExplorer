@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { endpoints } from "../store/movieStore";
+import { endpoints } from "../../store/movieStore";
 
 interface Movie {
   id: number;

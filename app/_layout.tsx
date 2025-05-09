@@ -8,10 +8,31 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <Stack>
         <Stack.Screen
-          name="index"
+          name="screens/HomeScreen"
           options={{
             title: "Movies",
-            headerShown: true,
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="screens/ExploreScreen"
+          options={{
+            title: "Explore",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="screens/SearchScreen"
+          options={{
+            title: "Search",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="screens/SettingsScreen"
+          options={{
+            title: "Settings",
+            headerShown: false,
           }}
         />
         <Stack.Screen
