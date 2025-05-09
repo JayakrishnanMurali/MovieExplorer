@@ -1,45 +1,70 @@
 import { Search, SlidersHorizontal } from "lucide-react-native";
-import React, { useState } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
   onFilterPress?: () => void;
+  onFocus?: () => void;
 }
 
-export default function SearchBar({ onSearch, onFilterPress }: SearchBarProps) {
-  const [query, setQuery] = useState("");
+export interface SearchBarRef {
+  focus: () => void;
+}
 
-  const handleSearch = () => {
-    onSearch(query);
-  };
+const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
+  ({ onSearch, onFilterPress, onFocus }, ref) => {
+    const [query, setQuery] = useState("");
+    const inputRef = useRef<TextInput>(null);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.leftIcon}>
-        {/* @ts-ignore */}
-        <Search color="#bbb" stroke="#bbb" size={20} />
+    useImperativeHandle(ref, () => ({
+      focus: () => {
+        inputRef.current?.focus();
+      },
+    }));
+
+    const handleSearch = () => {
+      onSearch(query);
+    };
+
+    return (
+      <View style={styles.container}>
+        <View style={styles.leftIcon}>
+          {/* @ts-ignore */}
+          <Search color="#bbb" stroke="#bbb" size={20} />
+        </View>
+        <TextInput
+          ref={inputRef}
+          style={styles.input}
+          placeholder="Search"
+          placeholderTextColor="#888"
+          value={query}
+          onChangeText={setQuery}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+          onFocus={onFocus}
+        />
+        <TouchableOpacity
+          style={styles.filterBtn}
+          onPress={onFilterPress}
+          activeOpacity={0.8}
+        >
+          {/* @ts-ignore */}
+          <SlidersHorizontal color="#fff" stroke="#fff" size={20} />
+        </TouchableOpacity>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Search"
-        placeholderTextColor="#888"
-        value={query}
-        onChangeText={setQuery}
-        onSubmitEditing={handleSearch}
-        returnKeyType="search"
-      />
-      <TouchableOpacity
-        style={styles.filterBtn}
-        onPress={onFilterPress}
-        activeOpacity={0.8}
-      >
-        {/* @ts-ignore */}
-        <SlidersHorizontal color="#fff" stroke="#fff" size={20} />
-      </TouchableOpacity>
-    </View>
-  );
-}
+    );
+  }
+);
+
+SearchBar.displayName = "SearchBar";
+
+export default SearchBar;
 
 const styles = StyleSheet.create({
   container: {

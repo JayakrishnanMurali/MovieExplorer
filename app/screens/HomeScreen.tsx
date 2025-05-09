@@ -91,7 +91,21 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#18181c" />
       <View style={styles.container}>
         <Header />
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar
+          onSearch={handleSearch}
+          onFilterPress={() =>
+            router.push({
+              pathname: "/screens/ExploreScreen",
+              params: { openFilter: "1" },
+            })
+          }
+          onFocus={() =>
+            router.push({
+              pathname: "/screens/ExploreScreen",
+              params: { focusSearch: "1" },
+            })
+          }
+        />
         <CategoryChips
           selectedGenre={selectedGenre}
           onSelect={setSelectedGenre}

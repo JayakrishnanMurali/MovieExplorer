@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BottomNav from "../../components/BottomNav";
-import SearchBar from "../../components/SearchBar";
+import SearchBar, { SearchBarRef } from "../../components/SearchBar";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 56) / 2;
@@ -49,7 +49,7 @@ const GENRE_LIST = Object.entries(GENRES_MAP).map(([id, name]) => ({
 }));
 
 export default function ExploreScreen() {
-  const { genre } = useLocalSearchParams();
+  const { genre, focusSearch, openFilter } = useLocalSearchParams();
   const [search, setSearch] = useState("");
   const [filterModal, setFilterModal] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState(
@@ -59,6 +59,26 @@ export default function ExploreScreen() {
   const [sheetAnim] = useState(new Animated.Value(0));
   const [activeTab, setActiveTab] = useState("explore");
   const router = useRouter();
+  const searchBarRef = useRef<SearchBarRef>(null);
+
+  useEffect(() => {
+    if (focusSearch === "1") {
+      setTimeout(() => {
+        searchBarRef.current?.focus();
+      }, 300);
+    }
+    if (openFilter === "1") {
+      setTimeout(() => {
+        setFilterModal(true);
+        Animated.timing(sheetAnim, {
+          toValue: 1,
+          duration: 250,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }).start();
+      }, 300);
+    }
+  }, [focusSearch, openFilter]);
 
   // Infinite query for movies
   const {
@@ -141,7 +161,11 @@ export default function ExploreScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <View style={styles.container}>
-        <SearchBar onSearch={handleSearch} onFilterPress={handleFilterPress} />
+        <SearchBar
+          ref={searchBarRef}
+          onSearch={handleSearch}
+          onFilterPress={handleFilterPress}
+        />
         <Text style={styles.title}>
           {search
             ? `Results for "${search}"`
