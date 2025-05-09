@@ -105,7 +105,12 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={styles.seeAllBtn}
             activeOpacity={0.8}
-            onPress={() => {}}
+            onPress={() =>
+              router.push({
+                pathname: "/screens/ExploreScreen",
+                params: { genre: selectedGenre },
+              })
+            }
           >
             <Text style={styles.seeAllText}>See all</Text>
             {/* @ts-ignore */}
