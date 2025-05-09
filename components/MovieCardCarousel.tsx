@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
+  Animated,
   Dimensions,
-  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -9,9 +9,9 @@ import {
   View,
 } from "react-native";
 
-const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.8;
-const CARD_HEIGHT = 320;
+const { width, height } = Dimensions.get("window");
+const CARD_WIDTH = width * 0.82;
+const CARD_HEIGHT = height * 0.44;
 
 interface Movie {
   id: number;
@@ -31,8 +31,10 @@ export default function MovieCardCarousel({
   movies,
   onPress,
 }: MovieCardCarouselProps) {
+  const scrollX = useRef(new Animated.Value(0)).current;
+
   return (
-    <FlatList
+    <Animated.FlatList
       data={movies}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -40,33 +42,59 @@ export default function MovieCardCarousel({
       decelerationRate="fast"
       contentContainerStyle={styles.carousel}
       keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          activeOpacity={0.9}
-          style={styles.card}
-          onPress={() => onPress(item.id)}
-        >
-          <Image
-            source={{
-              uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-            }}
-            style={styles.poster}
-          />
-          <View style={styles.infoContainer}>
-            <Text style={styles.title} numberOfLines={1}>
-              {item.title}
-            </Text>
-            <View style={styles.metaRow}>
-              <Text style={styles.year}>
-                {new Date(item.release_date).getFullYear()}
-              </Text>
-              <Text style={styles.rating}>
-                ⭐ {item.vote_average.toFixed(1)}
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+        { useNativeDriver: true }
       )}
+      pagingEnabled
+      renderItem={({ item, index }) => {
+        const inputRange = [
+          (index - 1) * (CARD_WIDTH + 24),
+          index * (CARD_WIDTH + 24),
+          (index + 1) * (CARD_WIDTH + 24),
+        ];
+        const scale = scrollX.interpolate({
+          inputRange,
+          outputRange: [0.95, 1, 0.95],
+          extrapolate: "clamp",
+        });
+        return (
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={styles.cardWrapper}
+            onPress={() => onPress(item.id)}
+          >
+            <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+              <Image
+                source={{
+                  uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
+                }}
+                style={styles.poster}
+              />
+              <View style={styles.badgeRow}>
+                <View style={styles.genreBadge}>
+                  <Text style={styles.badgeText}>Action</Text>
+                </View>
+                <View style={styles.imdbBadge}>
+                  <Text style={styles.imdbText}>
+                    IMDb {item.vote_average.toFixed(1)}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.overlay}>
+                <Text style={styles.title} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <View style={styles.metaRow}>
+                  <Text style={styles.year}>
+                    {new Date(item.release_date).getFullYear()}
+                  </Text>
+                </View>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
+        );
+      }}
     />
   );
 }
@@ -75,27 +103,75 @@ const styles = StyleSheet.create({
   carousel: {
     paddingLeft: 20,
     paddingVertical: 12,
+    alignItems: "center",
+  },
+  cardWrapper: {
+    height: CARD_HEIGHT,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 24,
   },
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
     backgroundColor: "#23232b",
-    borderRadius: 24,
-    marginRight: 24,
+    borderRadius: 28,
     overflow: "hidden",
-    elevation: 4,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
   },
   poster: {
     width: "100%",
-    height: CARD_HEIGHT - 80,
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
     resizeMode: "cover",
+    opacity: 0.92,
   },
-  infoContainer: {
-    padding: 16,
+  badgeRow: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    right: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    zIndex: 2,
+  },
+  genreBadge: {
+    backgroundColor: "#23232b",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  imdbBadge: {
+    backgroundColor: "#f5c518",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  imdbText: {
+    color: "#23232b",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  overlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 18,
+    backgroundColor: "rgba(24,24,28,0.92)",
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
   title: {
     color: "#fff",
@@ -112,10 +188,5 @@ const styles = StyleSheet.create({
     color: "#bbb",
     fontSize: 14,
     marginRight: 12,
-  },
-  rating: {
-    color: "#f5c518",
-    fontSize: 14,
-    fontWeight: "bold",
   },
 });
