@@ -99,7 +99,7 @@ export default function HomeScreen() {
         <View style={styles.featuredRow}>
           <Text style={styles.featuredTitle}>
             {selectedGenre === 0
-              ? "Featured Movies"
+              ? "Trending Movies"
               : `${GENRES_MAP[selectedGenre]} Movies`}
           </Text>
           <TouchableOpacity

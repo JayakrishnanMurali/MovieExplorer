@@ -203,8 +203,13 @@ function MovieGridCard({ movie }: { movie: any }) {
   const firstGenreName =
     genreIds.length > 0 ? GENRES_MAP[genreIds[0]] || "Other" : "Other";
   const extraGenres = genreIds.length > 1 ? ` +${genreIds.length - 1}` : "";
+  const router = useRouter();
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.9}
+      onPress={() => router.push(`/movie/${movie.id}`)}
+    >
       <Image
         source={{ uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}` }}
         style={styles.poster}
