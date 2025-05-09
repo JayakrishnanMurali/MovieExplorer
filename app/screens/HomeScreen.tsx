@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React, { useState } from "react";
 import {
+  Dimensions,
   StatusBar,
   StyleSheet,
   Text,
@@ -17,6 +18,16 @@ import Header from "../../components/Header";
 import MovieCardCarousel from "../../components/MovieCardCarousel";
 import SearchBar from "../../components/SearchBar";
 import { endpoints } from "../../store/movieStore";
+
+// Helper to get genre name from id
+const GENRES_MAP: { [key: number]: string } = {
+  28: "Action",
+  35: "Comedy",
+  27: "Horror",
+  10749: "Romance",
+  18: "Drama",
+  0: "Featured",
+};
 
 export default function HomeScreen() {
   const [selectedGenre, setSelectedGenre] = useState(0); // 0 = All
@@ -33,7 +44,7 @@ export default function HomeScreen() {
         return res.data.results;
       } else {
         const res = await axios.get(
-          `${endpoints.popular}&with_genres=${selectedGenre}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${selectedGenre}`
         );
         return res.data.results;
       }
@@ -86,7 +97,11 @@ export default function HomeScreen() {
           onSelect={setSelectedGenre}
         />
         <View style={styles.featuredRow}>
-          <Text style={styles.featuredTitle}>Featured Movies</Text>
+          <Text style={styles.featuredTitle}>
+            {selectedGenre === 0
+              ? "Featured Movies"
+              : `${GENRES_MAP[selectedGenre]} Movies`}
+          </Text>
           <TouchableOpacity
             style={styles.seeAllBtn}
             activeOpacity={0.8}
@@ -98,16 +113,45 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.carouselWrapper}>
-          <MovieCardCarousel
-            movies={searchQuery ? searchResults : movies}
-            onPress={handleMoviePress}
-          />
+          {isLoading ? (
+            <SkeletonCarousel />
+          ) : (
+            <MovieCardCarousel
+              movies={searchQuery ? searchResults : movies}
+              onPress={handleMoviePress}
+            />
+          )}
         </View>
         <View style={styles.bottomNavWrapper}>
           <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
         </View>
       </View>
     </SafeAreaView>
+  );
+}
+
+// Skeleton Loader Component
+function SkeletonCarousel() {
+  const { width, height } = Dimensions.get("window");
+  return (
+    <View style={{ flexDirection: "row", paddingLeft: 20 }}>
+      {[1, 2, 3].map((i) => (
+        <View
+          key={i}
+          style={{
+            width: width * 0.82,
+            height: height * 0.44,
+            backgroundColor: "#23232b",
+            borderRadius: 28,
+            marginRight: 24,
+            opacity: 0.5,
+            overflow: "hidden",
+          }}
+        >
+          <View style={{ flex: 1, backgroundColor: "#333", opacity: 0.2 }} />
+        </View>
+      ))}
+    </View>
   );
 }
 

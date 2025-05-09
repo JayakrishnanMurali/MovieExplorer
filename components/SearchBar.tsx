@@ -1,12 +1,13 @@
-import { Search } from "lucide-react-native";
+import { Search, SlidersHorizontal } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  onFilterPress?: () => void;
 }
 
-export default function SearchBar({ onSearch }: SearchBarProps) {
+export default function SearchBar({ onSearch, onFilterPress }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
@@ -15,18 +16,26 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.leftIcon}>
+        {/* @ts-ignore */}
+        <Search color="#bbb" stroke="#bbb" size={20} />
+      </View>
       <TextInput
         style={styles.input}
-        placeholder="Search movies..."
+        placeholder="Search"
         placeholderTextColor="#888"
         value={query}
         onChangeText={setQuery}
         onSubmitEditing={handleSearch}
         returnKeyType="search"
       />
-      <TouchableOpacity style={styles.iconBtn} onPress={handleSearch}>
+      <TouchableOpacity
+        style={styles.filterBtn}
+        onPress={onFilterPress}
+        activeOpacity={0.8}
+      >
         {/* @ts-ignore */}
-        <Search color="#fff" stroke="#fff" size={22} />
+        <SlidersHorizontal color="#fff" stroke="#fff" size={20} />
       </TouchableOpacity>
     </View>
   );
@@ -37,22 +46,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#23232b",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    borderRadius: 20,
     marginHorizontal: 20,
     marginBottom: 16,
+    height: 48,
+  },
+  leftIcon: {
+    marginLeft: 12,
+    marginRight: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   input: {
     flex: 1,
     color: "#fff",
     fontSize: 16,
     paddingVertical: 0,
+    paddingLeft: 0,
+    backgroundColor: "transparent",
   },
-  iconBtn: {
+  filterBtn: {
     marginLeft: 8,
-    padding: 4,
-    borderRadius: 16,
+    marginRight: 8,
     backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 14,
+    padding: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

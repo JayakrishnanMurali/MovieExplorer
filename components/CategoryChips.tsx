@@ -12,32 +12,32 @@ const GENRES = [
   {
     id: 28,
     name: "Action",
-    icon: /* @ts-ignore */ <Film color="#fff" stroke="#fff" size={18} />,
+    icon: Film,
   },
   {
     id: 35,
     name: "Comedy",
-    icon: /* @ts-ignore */ <Laugh color="#fff" stroke="#fff" size={18} />,
+    icon: Laugh,
   },
   {
     id: 27,
     name: "Horror",
-    icon: /* @ts-ignore */ <Ghost color="#fff" stroke="#fff" size={18} />,
+    icon: Ghost,
   },
   {
     id: 10749,
     name: "Romance",
-    icon: /* @ts-ignore */ <Heart color="#fff" stroke="#fff" size={18} />,
+    icon: Heart,
   },
   {
     id: 18,
     name: "Drama",
-    icon: /* @ts-ignore */ <Drama color="#fff" stroke="#fff" size={18} />,
+    icon: Drama,
   },
   {
     id: 0,
     name: "All",
-    icon: /* @ts-ignore */ <Star color="#fff" stroke="#fff" size={18} />,
+    icon: Star,
   },
 ];
 
@@ -58,27 +58,30 @@ export default function CategoryChips({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chipRow}
       >
-        {GENRES.map((genre) => (
-          <TouchableOpacity
-            key={genre.id}
-            style={[
-              styles.chip,
-              selectedGenre === genre.id && styles.chipSelected,
-            ]}
-            onPress={() => onSelect(genre.id)}
-            activeOpacity={0.8}
-          >
-            {genre.icon}
-            <Text
-              style={[
-                styles.chipText,
-                selectedGenre === genre.id && styles.chipTextSelected,
-              ]}
+        {GENRES.map((genre) => {
+          const Icon = genre.icon;
+          const isSelected = selectedGenre === genre.id;
+          return (
+            <TouchableOpacity
+              key={genre.id}
+              style={[styles.chip, isSelected && styles.chipSelected]}
+              onPress={() => onSelect(genre.id)}
+              activeOpacity={0.8}
             >
-              {genre.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              {/* @ts-ignore */}
+              <Icon
+                color={isSelected ? "#23232b" : "#fff"}
+                stroke={isSelected ? "#23232b" : "#fff"}
+                size={18}
+              />
+              <Text
+                style={[styles.chipText, isSelected && styles.chipTextSelected]}
+              >
+                {genre.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
