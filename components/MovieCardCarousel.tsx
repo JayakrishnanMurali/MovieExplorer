@@ -27,7 +27,6 @@ const GENRES_MAP: { [key: number]: string } = {
   36: "History",
   10402: "Music",
   9648: "Mystery",
-  10749: "Romance",
   878: "Science Fiction",
   10770: "TV Movie",
   53: "Thriller",
@@ -84,10 +83,11 @@ export default function MovieCardCarousel({
           outputRange: [0.95, 1, 0.95],
           extrapolate: "clamp",
         });
-        const genreName =
-          item.genre_ids && item.genre_ids.length > 0
-            ? GENRES_MAP[item.genre_ids[0]] || "Other"
-            : "Other";
+        const genreIds = item.genre_ids || [];
+        const firstGenreName =
+          genreIds.length > 0 ? GENRES_MAP[genreIds[0]] || "Other" : "Other";
+        const extraGenres =
+          genreIds.length > 1 ? ` +${genreIds.length - 1}` : "";
         return (
           <TouchableOpacity
             activeOpacity={0.9}
@@ -103,7 +103,10 @@ export default function MovieCardCarousel({
               />
               <View style={styles.badgeRow}>
                 <View style={styles.genreBadge}>
-                  <Text style={styles.badgeText}>{genreName}</Text>
+                  <Text style={styles.badgeText}>
+                    {firstGenreName}
+                    {extraGenres}
+                  </Text>
                 </View>
                 <View style={styles.imdbBadge}>
                   <Text style={styles.imdbText}>
