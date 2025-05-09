@@ -1,20 +1,21 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
   Dimensions,
+  Easing,
   FlatList,
   Image,
-  Modal,
-  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BottomNav from "../../components/BottomNav";
 import SearchBar from "../../components/SearchBar";
 
 const { width } = Dimensions.get("window");
@@ -54,6 +55,9 @@ export default function ExploreScreen() {
     genre && genre !== "0" ? Number(genre) : 0
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [sheetAnim] = useState(new Animated.Value(0));
+  const [activeTab, setActiveTab] = useState("explore");
+  const router = useRouter();
 
   // Infinite query for movies
   const {
@@ -103,11 +107,34 @@ export default function ExploreScreen() {
     setRefreshing(false);
   };
 
-  const handleFilterPress = () => setFilterModal(true);
+  const handleFilterPress = () => {
+    setFilterModal(true);
+    Animated.timing(sheetAnim, {
+      toValue: 1,
+      duration: 250,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  };
+  const handleFilterClose = () => {
+    Animated.timing(sheetAnim, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.in(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => setFilterModal(false));
+  };
   const handleGenreSelect = (id: number) => {
     setSelectedGenre(id);
-    setFilterModal(false);
+    handleFilterClose();
     refetch();
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === "home") router.push("/screens/HomeScreen");
+    if (tab === "settings") router.push("/screens/SettingsScreen");
+    if (tab === "explore") router.push("/screens/ExploreScreen");
   };
 
   return (
@@ -145,14 +172,26 @@ export default function ExploreScreen() {
             removeClippedSubviews={true}
             refreshing={refreshing}
             onRefresh={handleRefresh}
+            ListHeaderComponent={
+              refreshing ? (
+                <ActivityIndicator
+                  color="#f5c518"
+                  style={{ marginVertical: 12 }}
+                />
+              ) : null
+            }
           />
         )}
-        <GenreFilterModal
+        <GenreFilterSheet
           visible={filterModal}
-          onClose={() => setFilterModal(false)}
+          onClose={handleFilterClose}
           onSelect={handleGenreSelect}
           selectedGenre={selectedGenre}
+          sheetAnim={sheetAnim}
         />
+        <View style={styles.bottomNavWrapper}>
+          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -195,44 +234,68 @@ function MovieGridCard({ movie }: { movie: any }) {
 }
 
 function GridSkeleton() {
+  // Show two skeleton cards per row
   return (
     <View style={styles.grid}>
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <View
-          key={i}
-          style={{
-            width: CARD_WIDTH,
-            height: CARD_HEIGHT,
-            backgroundColor: "#23232b",
-            borderRadius: 24,
-            margin: 8,
-            opacity: 0.5,
-            overflow: "hidden",
-          }}
-        >
-          <View style={{ flex: 1, backgroundColor: "#333", opacity: 0.2 }} />
+      {[0, 1, 2].map((row) => (
+        <View key={row} style={{ flexDirection: "row" }}>
+          {[0, 1].map((col) => (
+            <View
+              key={col}
+              style={{
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                backgroundColor: "#23232b",
+                borderRadius: 24,
+                margin: 8,
+                opacity: 0.5,
+                overflow: "hidden",
+              }}
+            >
+              <View
+                style={{ flex: 1, backgroundColor: "#333", opacity: 0.2 }}
+              />
+            </View>
+          ))}
         </View>
       ))}
     </View>
   );
 }
 
-function GenreFilterModal({
+function GenreFilterSheet({
   visible,
   onClose,
   onSelect,
   selectedGenre,
+  sheetAnim,
 }: {
   visible: boolean;
   onClose: () => void;
   onSelect: (id: number) => void;
   selectedGenre: number;
+  sheetAnim: Animated.Value;
 }) {
+  if (!visible) return null;
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <Pressable style={styles.modalOverlay} onPress={onClose} />
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>Select Genre</Text>
+    <Animated.View
+      style={[
+        styles.sheet,
+        {
+          transform: [
+            {
+              translateY: sheetAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [400, 0],
+              }),
+            },
+          ],
+        },
+      ]}
+    >
+      <View style={styles.sheetHandle} />
+      <Text style={styles.modalTitle}>Select Genre</Text>
+      <View style={styles.sheetListContainer}>
         <FlatList
           data={[{ id: 0, name: "All" }, ...GENRE_LIST]}
           keyExtractor={(item) => item.id.toString()}
@@ -254,9 +317,21 @@ function GenreFilterModal({
               </Text>
             </TouchableOpacity>
           )}
+          ListHeaderComponent={<View style={{ height: 8 }} />}
+          contentContainerStyle={{ paddingBottom: 24 }}
+          style={{ flex: 1 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         />
       </View>
-    </Modal>
+      <TouchableOpacity style={styles.sheetCloseBtn} onPress={onClose}>
+        <Text
+          style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}
+        >
+          Close
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -397,5 +472,44 @@ const styles = StyleSheet.create({
   genreOptionTextSelected: {
     color: "#23232b",
     fontWeight: "bold",
+  },
+  sheet: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#23232b",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    minHeight: 480,
+    elevation: 20,
+    zIndex: 100,
+  },
+  sheetHandle: {
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#444",
+    alignSelf: "center",
+    marginBottom: 12,
+  },
+  sheetCloseBtn: {
+    marginTop: 16,
+    backgroundColor: "#18181c",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+  },
+  bottomNavWrapper: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 24,
+    paddingHorizontal: 24,
+  },
+  sheetListContainer: {
+    maxHeight: 320,
+    flex: 1,
   },
 });
