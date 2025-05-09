@@ -39,7 +39,7 @@ export default function RootLayout() {
           name="movie/[id]"
           options={{
             title: "Movie Details",
-            headerShown: true,
+            headerShown: false,
           }}
         />
       </Stack>
