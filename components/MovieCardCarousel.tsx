@@ -47,6 +47,10 @@ export default function MovieCardCarousel({
         { useNativeDriver: true }
       )}
       pagingEnabled
+      initialNumToRender={3}
+      maxToRenderPerBatch={3}
+      windowSize={5}
+      removeClippedSubviews={true}
       renderItem={({ item, index }) => {
         const inputRange = [
           (index - 1) * (CARD_WIDTH + 24),
