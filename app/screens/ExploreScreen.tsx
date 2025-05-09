@@ -7,15 +7,18 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import SearchBar from "../../components/SearchBar";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = (width - 56) / 2; // 20+8+8+20 padding/margin
+const CARD_WIDTH = (width - 56) / 2;
 const CARD_HEIGHT = CARD_WIDTH * 1.5;
 
 const GENRES_MAP: { [key: number]: string } = {
@@ -38,10 +41,19 @@ const GENRES_MAP: { [key: number]: string } = {
   10752: "War",
   37: "Western",
 };
+const GENRE_LIST = Object.entries(GENRES_MAP).map(([id, name]) => ({
+  id: Number(id),
+  name,
+}));
 
 export default function ExploreScreen() {
   const { genre } = useLocalSearchParams();
   const [search, setSearch] = useState("");
+  const [filterModal, setFilterModal] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState(
+    genre && genre !== "0" ? Number(genre) : 0
+  );
+  const [refreshing, setRefreshing] = useState(false);
 
   // Infinite query for movies
   const {
@@ -52,15 +64,15 @@ export default function ExploreScreen() {
     isLoading,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["explore", genre, search],
+    queryKey: ["explore", selectedGenre, search],
     queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
       let url = "";
       if (search) {
         url = `https://api.themoviedb.org/3/search/movie?api_key=${
           process.env.EXPO_PUBLIC_TMDB_API_KEY
         }&query=${encodeURIComponent(search)}&page=${pageParam}`;
-      } else if (genre && genre !== "0") {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${genre}&page=${pageParam}`;
+      } else if (selectedGenre && selectedGenre !== 0) {
+        url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${selectedGenre}&page=${pageParam}`;
       } else {
         url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&page=${pageParam}`;
       }
@@ -85,37 +97,64 @@ export default function ExploreScreen() {
     refetch();
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
+  const handleFilterPress = () => setFilterModal(true);
+  const handleGenreSelect = (id: number) => {
+    setSelectedGenre(id);
+    setFilterModal(false);
+    refetch();
+  };
+
   return (
-    <View style={styles.container}>
-      <SearchBar onSearch={handleSearch} />
-      <Text style={styles.title}>
-        {search
-          ? `Results for "${search}"`
-          : genre && genre !== "0"
-          ? `${GENRES_MAP[Number(genre)] || "Category"} Movies`
-          : "Trending Movies"}
-      </Text>
-      {isLoading ? (
-        <GridSkeleton />
-      ) : (
-        <FlatList
-          data={movies}
-          numColumns={2}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.grid}
-          renderItem={({ item }) => <MovieGridCard movie={item} />}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            isFetchingNextPage ? (
-              <ActivityIndicator color="#fff" style={{ margin: 16 }} />
-            ) : null
-          }
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+      <View style={styles.container}>
+        <SearchBar onSearch={handleSearch} onFilterPress={handleFilterPress} />
+        <Text style={styles.title}>
+          {search
+            ? `Results for "${search}"`
+            : selectedGenre && selectedGenre !== 0
+            ? `${GENRES_MAP[selectedGenre] || "Category"} Movies`
+            : "Trending Movies"}
+        </Text>
+        {isLoading ? (
+          <GridSkeleton />
+        ) : (
+          <FlatList
+            data={movies}
+            numColumns={2}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={styles.grid}
+            renderItem={({ item }) => <MovieGridCard movie={item} />}
+            onEndReached={() => {
+              if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+            }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              isFetchingNextPage ? (
+                <ActivityIndicator color="#fff" style={{ margin: 16 }} />
+              ) : null
+            }
+            initialNumToRender={6}
+            maxToRenderPerBatch={6}
+            windowSize={9}
+            removeClippedSubviews={true}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        )}
+        <GenreFilterModal
+          visible={filterModal}
+          onClose={() => setFilterModal(false)}
+          onSelect={handleGenreSelect}
+          selectedGenre={selectedGenre}
         />
-      )}
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -132,7 +171,7 @@ function MovieGridCard({ movie }: { movie: any }) {
       />
       <View style={styles.badgeRow}>
         <View style={styles.genreBadge}>
-          <Text style={styles.badgeText}>
+          <Text style={styles.badgeText} numberOfLines={1} ellipsizeMode="tail">
             {firstGenreName}
             {extraGenres}
           </Text>
@@ -178,11 +217,58 @@ function GridSkeleton() {
   );
 }
 
+function GenreFilterModal({
+  visible,
+  onClose,
+  onSelect,
+  selectedGenre,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (id: number) => void;
+  selectedGenre: number;
+}) {
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <Pressable style={styles.modalOverlay} onPress={onClose} />
+      <View style={styles.modalContent}>
+        <Text style={styles.modalTitle}>Select Genre</Text>
+        <FlatList
+          data={[{ id: 0, name: "All" }, ...GENRE_LIST]}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[
+                styles.genreOption,
+                selectedGenre === item.id && styles.genreOptionSelected,
+              ]}
+              onPress={() => onSelect(item.id)}
+            >
+              <Text
+                style={[
+                  styles.genreOptionText,
+                  selectedGenre === item.id && styles.genreOptionTextSelected,
+                ]}
+              >
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    </Modal>
+  );
+}
+
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#18181c",
+  },
   container: {
     flex: 1,
     backgroundColor: "#18181c",
-    paddingTop: 24,
+    paddingTop: 0,
   },
   title: {
     color: "#fff",
@@ -225,17 +311,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     zIndex: 2,
+    minWidth: 0,
+    flexShrink: 1,
   },
   genreBadge: {
     backgroundColor: "#23232b",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 3,
+    minWidth: 0,
+    maxWidth: CARD_WIDTH * 0.6,
+    flexShrink: 1,
   },
   badgeText: {
     color: "#fff",
     fontSize: 11,
     fontWeight: "bold",
+    minWidth: 0,
+    flexShrink: 1,
   },
   imdbBadge: {
     backgroundColor: "#f5c518",
@@ -267,5 +360,42 @@ const styles = StyleSheet.create({
   year: {
     color: "#bbb",
     fontSize: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  modalContent: {
+    position: "absolute",
+    top: "25%",
+    left: 32,
+    right: 32,
+    backgroundColor: "#23232b",
+    borderRadius: 20,
+    padding: 24,
+    elevation: 10,
+  },
+  modalTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  genreOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    marginBottom: 4,
+  },
+  genreOptionSelected: {
+    backgroundColor: "#f5c518",
+  },
+  genreOptionText: {
+    color: "#fff",
+    fontSize: 15,
+  },
+  genreOptionTextSelected: {
+    color: "#23232b",
+    fontWeight: "bold",
   },
 });
