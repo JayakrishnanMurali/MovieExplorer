@@ -16,25 +16,27 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
         "APP_ENV": "preview",
         "EXPO_PUBLIC_TMDB_API_KEY": "adecf34172ed2133906cb330e6a147fe",
         "EXPO_PUBLIC_TMDB_BASE_URL": "https://api.themoviedb.org/3"
       },
-      "prebuildCommand": "yarn install --frozen-lockfile"
+      "prebuildCommand": "yarn install --frozen-lockfile && npx expo prebuild"
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "env": {
         "APP_ENV": "production",
         "EXPO_PUBLIC_TMDB_API_KEY": "adecf34172ed2133906cb330e6a147fe",
         "EXPO_PUBLIC_TMDB_BASE_URL": "https://api.themoviedb.org/3"
       },
-      "prebuildCommand": "yarn install --frozen-lockfile"
+      "prebuildCommand": "yarn install --frozen-lockfile && npx expo prebuild"
     }
   }
 }
