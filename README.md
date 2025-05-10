@@ -93,7 +93,7 @@ A modern React Native mobile application that allows users to explore and discov
    Create a `.env` file in the root directory and add your TMDb API key:
 
    ```
-   EXPO_PUBLIC_TMDB_API_KEY=your_api_key_here
+   TMDB_API_KEY=your_api_key_here
    EXPO_PUBLIC_TMDB_BASE_URL=https://api.themoviedb.org/3
    ```
 

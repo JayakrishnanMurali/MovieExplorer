@@ -15,7 +15,7 @@ export default function SearchScreen() {
       if (!q) return [];
       const res = await axios.get(
         `https://api.themoviedb.org/3/search/movie?api_key=${
-          process.env.EXPO_PUBLIC_TMDB_API_KEY
+          process.env.TMDB_API_KEY
         }&query=${encodeURIComponent(q as string)}`
       );
       return res.data.results;

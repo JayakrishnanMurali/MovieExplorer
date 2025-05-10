@@ -65,12 +65,12 @@ export default function ExploreScreen() {
       let url = "";
       if (debouncedSearch) {
         url = `https://api.themoviedb.org/3/search/movie?api_key=${
-          process.env.EXPO_PUBLIC_TMDB_API_KEY
+          process.env.TMDB_API_KEY
         }&query=${encodeURIComponent(debouncedSearch)}&page=${pageParam}`;
       } else if (selectedGenre && selectedGenre !== 0) {
-        url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${selectedGenre}&page=${pageParam}`;
+        url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&with_genres=${selectedGenre}&page=${pageParam}`;
       } else {
-        url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&page=${pageParam}`;
+        url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.TMDB_API_KEY}&page=${pageParam}`;
       }
       const res = await axios.get(url);
       return {

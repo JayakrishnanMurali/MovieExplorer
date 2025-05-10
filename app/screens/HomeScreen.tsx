@@ -34,7 +34,7 @@ export default function HomeScreen() {
         return res.data.results;
       } else {
         const res = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${selectedGenre}`
+          `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.TMDB_API_KEY}&with_genres=${selectedGenre}`
         );
         return res.data.results;
       }
@@ -48,7 +48,7 @@ export default function HomeScreen() {
       if (!searchQuery) return [];
       const res = await axios.get(
         `https://api.themoviedb.org/3/search/movie?api_key=${
-          process.env.EXPO_PUBLIC_TMDB_API_KEY
+          process.env.TMDB_API_KEY
         }&query=${encodeURIComponent(searchQuery)}`
       );
       return res.data.results;
