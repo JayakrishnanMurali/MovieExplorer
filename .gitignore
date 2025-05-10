@@ -85,3 +85,17 @@ yarn-error.*
 app-example
 
 .env
+
+# Production
+/build
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temporary files
+*.log
+*.tmp
+*.temp
