@@ -1,13 +1,7 @@
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  ArrowLeft,
-  Download,
-  ExternalLink,
-  Heart,
-  Play,
-} from "lucide-react-native";
+import { ArrowLeft, Download, Heart, Play, Share2 } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   Dimensions,
@@ -15,6 +9,7 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -81,6 +76,25 @@ export default function MovieDetailScreen() {
     };
     fetchMovieData();
   }, [id]);
+
+  const handleShare = async () => {
+    try {
+      const shareMessage = `${movie.title} (${new Date(
+        movie.release_date
+      ).getFullYear()})\n\n${
+        movie.overview
+      }\n\nRating: ${movie.vote_average.toFixed(
+        1
+      )}/10\n\nCheck it out on Movie Explorer!`;
+
+      await Share.share({
+        message: shareMessage,
+        title: movie.title,
+      });
+    } catch (error) {
+      console.error("Error sharing movie:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -403,8 +417,8 @@ export default function MovieDetailScreen() {
           <TouchableOpacity style={styles.actionBtn}>
             <Download color="#fff" size={20} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn}>
-            <ExternalLink color="#fff" size={20} />
+          <TouchableOpacity style={styles.actionBtn} onPress={handleShare}>
+            <Share2 color="#fff" size={20} />
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.watchBtn} activeOpacity={0.9}>
