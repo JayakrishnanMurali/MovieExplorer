@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SearchResultCard } from "../../components/movie/SearchResultCard";
 
