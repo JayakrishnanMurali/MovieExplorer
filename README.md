@@ -2,6 +2,25 @@
 
 A modern React Native mobile application that allows users to explore and discover movies using the TMDb (The Movie Database) API. Built with Expo and React Native, this app provides a seamless movie browsing experience with features like infinite scrolling, search, and detailed movie information.
 
+## Screenshots 📱
+
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="assets/images/Screenshot-1.png" alt="Movie Explorer Screenshot 1" width="200"/></td>
+      <td><img src="assets/images/Screenshot-2.png" alt="Movie Explorer Screenshot 2" width="200"/></td>
+      <td><img src="assets/images/Screenshot-3.png" alt="Movie Explorer Screenshot 3" width="200"/></td>
+      <td><img src="assets/images/Screenshot-4.png" alt="Movie Explorer Screenshot 4" width="200"/></td>
+    </tr>
+    <tr>
+      <td><img src="assets/images/Screenshot-5.png" alt="Movie Explorer Screenshot 5" width="200"/></td>
+      <td><img src="assets/images/Screenshot-6.png" alt="Movie Explorer Screenshot 6" width="200"/></td>
+      <td><img src="assets/images/Screenshot-7.png" alt="Movie Explorer Screenshot 7" width="200"/></td>
+      <td><img src="assets/images/Screenshot-8.png" alt="Movie Explorer Screenshot 8" width="200"/></td>
+    </tr>
+  </table>
+</div>
+
 ## Features ✨
 
 - **Movie Discovery**
