@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Movie } from "../types/movie";
 
 const { width, height } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.82;
@@ -33,15 +34,6 @@ const GENRES_MAP: { [key: number]: string } = {
   10752: "War",
   37: "Western",
 };
-
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-  vote_average: number;
-  release_date: string;
-  genre_ids?: number[];
-}
 
 interface MovieCardCarouselProps {
   movies: Movie[];

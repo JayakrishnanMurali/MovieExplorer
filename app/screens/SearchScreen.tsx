@@ -2,14 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { SearchResultCard } from "../../components/movie/SearchResultCard";
 
 export default function SearchScreen() {
   const { q } = useLocalSearchParams();
@@ -31,28 +25,15 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Search Results for "{q}"</Text>
+      <Text style={styles.title}>Search Results for &ldquo;{q}&rdquo;</Text>
       <FlatList
         data={results}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.resultCard}
+          <SearchResultCard
+            movie={item}
             onPress={() => router.push(`/movie/${item.id}`)}
-          >
-            <Image
-              source={{
-                uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-              }}
-              style={styles.poster}
-            />
-            <View style={styles.info}>
-              <Text style={styles.movieTitle}>{item.title}</Text>
-              <Text style={styles.year}>
-                {new Date(item.release_date).getFullYear()}
-              </Text>
-            </View>
-          </TouchableOpacity>
+          />
         )}
         ListEmptyComponent={
           !isLoading ? (
@@ -76,34 +57,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 16,
-  },
-  resultCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#23232b",
-    borderRadius: 16,
-    marginBottom: 14,
-    padding: 10,
-  },
-  poster: {
-    width: 60,
-    height: 90,
-    borderRadius: 8,
-    marginRight: 14,
-    backgroundColor: "#333",
-  },
-  info: {
-    flex: 1,
-  },
-  movieTitle: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  year: {
-    color: "#bbb",
-    fontSize: 14,
-    marginTop: 4,
   },
   emptyText: {
     color: "#bbb",

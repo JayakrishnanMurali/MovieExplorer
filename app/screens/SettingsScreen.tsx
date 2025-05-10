@@ -4,51 +4,20 @@ import React from "react";
 import {
   Dimensions,
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import AppLayout from "../../components/AppLayout";
+import { FavoritesSkeleton } from "../../components/explore/FavoritesSkeleton";
+import { FavoriteMovieCard } from "../../components/movie/FavoriteMovieCard";
 import { useFavoritesStore } from "../../store/favoritesStore";
 
 // Dummy hook for favorites, replace with Zustand or Context
 const { width, height } = Dimensions.get("window");
 
-function FavoritesSkeleton() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#18181c",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {[0, 1, 2].map((row) => (
-        <View key={row} style={{ flexDirection: "row" }}>
-          {[0, 1].map((col) => (
-            <View
-              key={col}
-              style={{
-                width: width * 0.42,
-                height: height * 0.22,
-                backgroundColor: "#23232b",
-                borderRadius: 24,
-                margin: 12,
-                opacity: 0.5,
-                overflow: "hidden",
-              }}
-            />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
-
-export default function FavoritesScreen() {
+export default function SettingsScreen() {
   const router = useRouter();
   const { favorites, loading } = useFavoritesStore();
 
@@ -56,25 +25,20 @@ export default function FavoritesScreen() {
     if (tab === "home") router.push("/screens/HomeScreen");
     if (tab === "explore") router.push("/screens/ExploreScreen");
     if (tab === "favorites") router.push("/screens/FavoritesScreen");
+    if (tab === "settings") router.push("/screens/SettingsScreen");
   };
 
   if (loading) {
     return (
-      <AppLayout activeTab="favorites" onTabChange={handleTabChange}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          {[0, 1, 2].map((i) => (
-            <View key={i} style={styles.skeletonCard} />
-          ))}
-        </View>
+      <AppLayout activeTab="settings" onTabChange={handleTabChange}>
+        <FavoritesSkeleton />
       </AppLayout>
     );
   }
 
   if (!favorites || favorites.length === 0) {
     return (
-      <AppLayout activeTab="favorites" onTabChange={handleTabChange}>
+      <AppLayout activeTab="settings" onTabChange={handleTabChange}>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No favorites yet</Text>
           <TouchableOpacity
@@ -90,27 +54,16 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <AppLayout activeTab="favorites" onTabChange={handleTabChange}>
+    <AppLayout activeTab="settings" onTabChange={handleTabChange}>
       <FlatList
         data={favorites}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.grid}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.9}
+          <FavoriteMovieCard
+            movie={item as any}
             onPress={() => router.push(`/movie/${item.id}`)}
-          >
-            <Image
-              source={{
-                uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-              }}
-              style={styles.poster}
-            />
-            <Text style={styles.title} numberOfLines={1}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
+          />
         )}
       />
     </AppLayout>

@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import { ChevronRight } from "lucide-react-native";
 import React, { useState } from "react";
 import {
-  Dimensions,
   StatusBar,
   StyleSheet,
   Text,
@@ -13,20 +12,12 @@ import {
 } from "react-native";
 import AppLayout from "../../components/AppLayout";
 import CategoryChips from "../../components/CategoryChips";
+import { SkeletonCarousel } from "../../components/explore/SkeletonCarousel";
 import Header from "../../components/Header";
 import MovieCardCarousel from "../../components/MovieCardCarousel";
 import SearchBar from "../../components/SearchBar";
+import { GENRES_MAP } from "../../constants/genres";
 import { endpoints } from "../../store/movieStore";
-
-// Helper to get genre name from id
-const GENRES_MAP: { [key: number]: string } = {
-  28: "Action",
-  35: "Comedy",
-  27: "Horror",
-  10749: "Romance",
-  18: "Drama",
-  0: "Featured",
-};
 
 export default function HomeScreen() {
   const [selectedGenre, setSelectedGenre] = useState(0); // 0 = All
@@ -145,36 +136,7 @@ export default function HomeScreen() {
   );
 }
 
-// Skeleton Loader Component
-function SkeletonCarousel() {
-  const { width, height } = Dimensions.get("window");
-  return (
-    <View style={{ flexDirection: "row", paddingLeft: 20 }}>
-      {[1, 2, 3].map((i) => (
-        <View
-          key={i}
-          style={{
-            width: width * 0.82,
-            height: height * 0.44,
-            backgroundColor: "#23232b",
-            borderRadius: 28,
-            marginRight: 24,
-            opacity: 0.5,
-            overflow: "hidden",
-          }}
-        >
-          <View style={{ flex: 1, backgroundColor: "#333", opacity: 0.2 }} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#18181c",
-  },
   container: {
     flex: 1,
     backgroundColor: "#18181c",
@@ -212,12 +174,5 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 200,
     marginBottom: 70, // leave space for bottom nav
-  },
-  bottomNavWrapper: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 24,
-    paddingHorizontal: 24,
   },
 });

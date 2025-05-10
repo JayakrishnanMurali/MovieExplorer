@@ -4,13 +4,14 @@ import React from "react";
 import {
   Dimensions,
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import AppLayout from "../../components/AppLayout";
+import { FavoritesSkeleton } from "../../components/explore/FavoritesSkeleton";
+import { FavoriteMovieCard } from "../../components/movie/FavoriteMovieCard";
 import { useFavoritesStore } from "../../store/favoritesStore";
 
 // Dummy hook for favorites, replace with Zustand or Context
@@ -39,91 +40,6 @@ const GENRES_MAP: { [key: number]: string } = {
 
 const CARD_HEIGHT = height * 0.38;
 
-function FavoriteMovieCard({
-  movie,
-  onPress,
-}: {
-  movie: any;
-  onPress: () => void;
-}) {
-  // Support both genre_ids (array of numbers) and genres (array of objects)
-  let genreIds: number[] = [];
-  if (Array.isArray(movie.genre_ids) && movie.genre_ids.length > 0) {
-    genreIds = movie.genre_ids;
-  } else if (Array.isArray(movie.genres) && movie.genres.length > 0) {
-    genreIds = movie.genres.map((g: any) => g.id);
-  }
-  // Prefer GENRES_MAP lookup, fallback to movie.genres[0]?.name, then "Other"
-  const firstGenreName =
-    genreIds.length > 0
-      ? GENRES_MAP[genreIds[0]] ||
-        (movie.genres && movie.genres[0]?.name) ||
-        "Other"
-      : "Other";
-  const extraGenres = genreIds.length > 1 ? ` +${genreIds.length - 1}` : "";
-  return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={onPress}>
-      <Image
-        source={{ uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}` }}
-        style={styles.poster}
-      />
-      <View style={styles.badgeRow}>
-        <View style={styles.genreBadge}>
-          <Text style={styles.badgeText} numberOfLines={1} ellipsizeMode="tail">
-            {firstGenreName}
-            {extraGenres}
-          </Text>
-        </View>
-        <View style={styles.imdbBadge}>
-          <Text style={styles.imdbText}>
-            IMDb {movie.vote_average?.toFixed(1) || "-"}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.overlay}>
-        <Text style={styles.title} numberOfLines={1}>
-          {movie.title}
-        </Text>
-        <Text style={styles.year}>
-          {movie.release_date ? new Date(movie.release_date).getFullYear() : ""}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function FavoritesSkeleton() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#18181c",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {[0, 1, 2].map((row) => (
-        <View key={row} style={{ flexDirection: "row" }}>
-          {[0, 1].map((col) => (
-            <View
-              key={col}
-              style={{
-                width: width * 0.42,
-                height: height * 0.22,
-                backgroundColor: "#23232b",
-                borderRadius: 24,
-                margin: 12,
-                opacity: 0.5,
-                overflow: "hidden",
-              }}
-            />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
-
 export default function FavoritesScreen() {
   const router = useRouter();
   const { favorites, loading } = useFavoritesStore();
@@ -150,13 +66,7 @@ export default function FavoritesScreen() {
   if (loading) {
     return (
       <AppLayout activeTab="favorites" onTabChange={handleTabChange}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          {[0, 1, 2].map((i) => (
-            <View key={i} style={styles.skeletonCard} />
-          ))}
-        </View>
+        <FavoritesSkeleton />
       </AppLayout>
     );
   }
@@ -187,7 +97,7 @@ export default function FavoritesScreen() {
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <FavoriteMovieCard
-            movie={item}
+            movie={item as any}
             onPress={() => router.push(`/movie/${item.id}`)}
           />
         )}
