@@ -20,6 +20,9 @@
     },
     "android": {
       "package": "com.rollinsoul.MovieExplorer"
+    },
+    "ios": {
+      "bundleIdentifier": "com.rollinsoul.MovieExplorer"
     }
   }
 }
