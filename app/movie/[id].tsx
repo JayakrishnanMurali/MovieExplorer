@@ -306,11 +306,7 @@ export default function MovieDetailScreen() {
               if (isFavorite) {
                 removeFavorite(movie.id);
               } else {
-                addFavorite({
-                  id: movie.id,
-                  title: movie.title,
-                  poster_path: movie.poster_path,
-                });
+                addFavorite(movie);
               }
             }}
           >
