@@ -44,7 +44,10 @@ const SearchBar = forwardRef<SearchBarRef, SearchBarProps>(
           placeholder="Search"
           placeholderTextColor="#888"
           value={query}
-          onChangeText={setQuery}
+          onChangeText={(text) => {
+            setQuery(text);
+            onSearch(text);
+          }}
           onSubmitEditing={handleSearch}
           returnKeyType="search"
           onFocus={onFocus}

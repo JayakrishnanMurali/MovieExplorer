@@ -47,9 +47,24 @@ const GENRE_LIST = Object.entries(GENRES_MAP).map(([id, name]) => ({
   name,
 }));
 
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 export default function ExploreScreen() {
   const { genre, focusSearch, openFilter } = useLocalSearchParams();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 1000);
   const [filterModal, setFilterModal] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState(
     genre && genre !== "0" ? Number(genre) : 0
@@ -88,13 +103,13 @@ export default function ExploreScreen() {
     isLoading,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ["explore", selectedGenre, search],
+    queryKey: ["explore", selectedGenre, debouncedSearch],
     queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
       let url = "";
-      if (search) {
+      if (debouncedSearch) {
         url = `https://api.themoviedb.org/3/search/movie?api_key=${
           process.env.EXPO_PUBLIC_TMDB_API_KEY
-        }&query=${encodeURIComponent(search)}&page=${pageParam}`;
+        }&query=${encodeURIComponent(debouncedSearch)}&page=${pageParam}`;
       } else if (selectedGenre && selectedGenre !== 0) {
         url = `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}&with_genres=${selectedGenre}&page=${pageParam}`;
       } else {
@@ -118,7 +133,6 @@ export default function ExploreScreen() {
 
   const handleSearch = (q: string) => {
     setSearch(q);
-    refetch();
   };
 
   const handleRefresh = async () => {
