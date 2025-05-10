@@ -10,7 +10,6 @@ import {
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   Image,
   SafeAreaView,
@@ -69,9 +68,211 @@ export default function MovieDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#f5c518" />
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 32 }}
+        >
+          {/* Header row skeleton */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: 8,
+              marginBottom: 12,
+              paddingHorizontal: 16,
+            }}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                backgroundColor: "#23232b",
+                borderRadius: 16,
+              }}
+            />
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                backgroundColor: "#23232b",
+                borderRadius: 16,
+              }}
+            />
+          </View>
+          {/* Banner with poster skeleton */}
+          <View
+            style={{
+              width,
+              alignItems: "center",
+              marginBottom: 18,
+              position: "relative",
+              borderBottomLeftRadius: 32,
+              borderBottomRightRadius: 32,
+              overflow: "hidden",
+              backgroundColor: "#23232b",
+              alignSelf: "center",
+            }}
+          >
+            <View
+              style={{
+                width,
+                height: POSTER_HEIGHT + 40,
+                backgroundColor: "#23232b",
+                position: "absolute",
+                top: 0,
+                left: 0,
+              }}
+            />
+            <View
+              style={{
+                width: width - 40,
+                height: POSTER_HEIGHT,
+                backgroundColor: "#333",
+                borderRadius: 24,
+                marginTop: 12,
+                alignSelf: "center",
+                opacity: 0.5,
+              }}
+            />
+          </View>
+          {/* Title skeleton */}
+          <View
+            style={{
+              width: width * 0.6,
+              height: 28,
+              backgroundColor: "#23232b",
+              borderRadius: 8,
+              alignSelf: "center",
+              marginBottom: 8,
+              opacity: 0.5,
+            }}
+          />
+          {/* Meta row skeleton */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <View
+              style={{
+                width: 60,
+                height: 16,
+                backgroundColor: "#23232b",
+                borderRadius: 8,
+                marginHorizontal: 4,
+                opacity: 0.5,
+              }}
+            />
+            <View
+              style={{
+                width: 60,
+                height: 16,
+                backgroundColor: "#23232b",
+                borderRadius: 8,
+                marginHorizontal: 4,
+                opacity: 0.5,
+              }}
+            />
+            <View
+              style={{
+                width: 60,
+                height: 16,
+                backgroundColor: "#23232b",
+                borderRadius: 8,
+                marginHorizontal: 4,
+                opacity: 0.5,
+              }}
+            />
+          </View>
+          {/* Stars skeleton */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              marginBottom: 16,
+            }}
+          >
+            {[...Array(5)].map((_, i) => (
+              <View
+                key={i}
+                style={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: "#23232b",
+                  borderRadius: 10,
+                  marginRight: 2,
+                  opacity: 0.5,
+                }}
+              />
+            ))}
+          </View>
+          {/* Action row skeleton */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              marginBottom: 16,
+            }}
+          >
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                backgroundColor: "#23232b",
+                borderRadius: 16,
+                marginHorizontal: 6,
+                opacity: 0.5,
+              }}
+            />
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                backgroundColor: "#23232b",
+                borderRadius: 16,
+                marginHorizontal: 6,
+                opacity: 0.5,
+              }}
+            />
+          </View>
+          {/* Watch Now button skeleton */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#e74c3c",
+              borderRadius: 18,
+              paddingVertical: 14,
+              paddingHorizontal: 32,
+              alignSelf: "center",
+              marginBottom: 18,
+              marginTop: 2,
+              opacity: 0.3,
+              width: 180,
+              height: 48,
+            }}
+          />
+          {/* Overview skeleton */}
+          <View
+            style={{
+              width: width - 40,
+              height: 80,
+              backgroundColor: "#23232b",
+              borderRadius: 12,
+              marginHorizontal: 20,
+              marginTop: 8,
+              alignSelf: "center",
+              opacity: 0.5,
+            }}
+          />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
