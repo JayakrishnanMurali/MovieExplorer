@@ -6,7 +6,12 @@ const queryClient = new QueryClient();
 export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          animation: "none",
+          animationDuration: 0,
+        }}
+      >
         <Stack.Screen
           name="screens/HomeScreen"
           options={{
