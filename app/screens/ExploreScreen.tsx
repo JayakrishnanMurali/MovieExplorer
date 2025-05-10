@@ -50,7 +50,7 @@ export default function ExploreScreen() {
         }).start();
       }, 300);
     }
-  }, [focusSearch, openFilter]);
+  }, [focusSearch, openFilter, searchBarRef, sheetAnim]);
 
   const {
     data,

@@ -6,6 +6,8 @@ export interface Movie {
   genres?: { id: number; name: string }[];
   vote_average: number;
   release_date: string;
+  runtime: number;
+  overview: string;
 }
 
 export interface MovieResponse {

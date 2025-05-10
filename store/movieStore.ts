@@ -1,19 +1,9 @@
+import { Movie } from "@/types/movie";
 import axios from "axios";
 import { create } from "zustand";
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = process.env.EXPO_PUBLIC_TMDB_BASE_URL;
-
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string;
-  overview: string;
-  release_date: string;
-  vote_average: number;
-  runtime: number;
-  genres: { id: number; name: string }[];
-}
 
 interface MovieStore {
   movies: Movie[];
@@ -32,6 +22,7 @@ export const useMovieStore = create<MovieStore>((set) => ({
       );
       return response.data;
     } catch (error) {
+      console.error("Failed to fetch movie details:", error);
       return undefined;
     }
   },
@@ -42,6 +33,7 @@ export const useMovieStore = create<MovieStore>((set) => ({
       );
       return response.data.results;
     } catch (error) {
+      console.error("Failed to fetch recommended movies:", error);
       return [];
     }
   },
@@ -54,6 +46,8 @@ export const endpoints = {
     `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}`,
   recommendedMovies: (id: number) =>
     `${TMDB_BASE_URL}/movie/${id}/recommendations?api_key=${TMDB_API_KEY}`,
+  search: (query: string) =>
+    `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${query}`,
 };
 
 export const getMovieDetailsSelector = (state: MovieStore) =>

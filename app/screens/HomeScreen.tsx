@@ -117,7 +117,6 @@ export default function HomeScreen() {
             }
           >
             <Text style={styles.seeAllText}>See all</Text>
-            {/* @ts-ignore */}
             <ChevronRight color="#fff" stroke="#fff" size={18} />
           </TouchableOpacity>
         </View>
