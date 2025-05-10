@@ -46,9 +46,20 @@ function FavoriteMovieCard({
   movie: any;
   onPress: () => void;
 }) {
-  const genreIds = movie.genre_ids || [];
+  // Support both genre_ids (array of numbers) and genres (array of objects)
+  let genreIds: number[] = [];
+  if (Array.isArray(movie.genre_ids) && movie.genre_ids.length > 0) {
+    genreIds = movie.genre_ids;
+  } else if (Array.isArray(movie.genres) && movie.genres.length > 0) {
+    genreIds = movie.genres.map((g: any) => g.id);
+  }
+  // Prefer GENRES_MAP lookup, fallback to movie.genres[0]?.name, then "Other"
   const firstGenreName =
-    genreIds.length > 0 ? GENRES_MAP[genreIds[0]] || "Other" : "Other";
+    genreIds.length > 0
+      ? GENRES_MAP[genreIds[0]] ||
+        (movie.genres && movie.genres[0]?.name) ||
+        "Other"
+      : "Other";
   const extraGenres = genreIds.length > 1 ? ` +${genreIds.length - 1}` : "";
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={onPress}>
@@ -123,6 +134,19 @@ export default function FavoritesScreen() {
     if (tab === "favorites") router.push("/screens/FavoritesScreen");
   };
 
+  const ListHeader = () => (
+    <View style={styles.headerRow}>
+      <Text style={styles.headerTitle}>Your Favorite Movies</Text>
+      <TouchableOpacity
+        style={styles.addBtn}
+        onPress={() => router.push("/screens/ExploreScreen")}
+        activeOpacity={0.8}
+      >
+        <Plus color="#fff" size={24} />
+      </TouchableOpacity>
+    </View>
+  );
+
   if (loading) {
     return (
       <AppLayout activeTab="favorites" onTabChange={handleTabChange}>
@@ -159,7 +183,8 @@ export default function FavoritesScreen() {
       <FlatList
         data={favorites}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.grid}
+        contentContainerStyle={[styles.grid, { paddingBottom: 120 }]}
+        ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <FavoriteMovieCard
             movie={item}
@@ -282,5 +307,24 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 20,
     opacity: 0.5,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+    marginTop: 2,
+    paddingHorizontal: 2,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  addBtn: {
+    backgroundColor: "#e74c3c",
+    borderRadius: 24,
+    padding: 10,
+    marginLeft: 8,
   },
 });
