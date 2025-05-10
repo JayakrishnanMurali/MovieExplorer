@@ -52,14 +52,16 @@ ios/Runner/GeneratedPluginRegistrant.*
 # Android
 android/app/build/
 android/build/
-android/.gradle/
+android/.gradle/runtime-jars/
+android/.gradle/daemon/
+android/.gradle/caches/
 android/local.properties
 android/*.iml
 android/.idea/
-android/.gradle/
 android/captures/
-android/gradlew
-android/gradlew.bat
+# Keep gradlew and gradlew.bat for EAS builds
+# android/gradlew
+# android/gradlew.bat
 android/key.properties
 android/*.hprof
 android/.DS_Store

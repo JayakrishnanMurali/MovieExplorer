@@ -1,4 +1,4 @@
-package com.jayakrishnanmurali.MovieExplorer
+package com.rollinsoul.MovieExplorer
 
 import android.app.Application
 import android.content.res.Configuration
