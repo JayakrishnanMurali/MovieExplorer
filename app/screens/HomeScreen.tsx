@@ -11,8 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import BottomNav from "../../components/BottomNav";
+import AppLayout from "../../components/AppLayout";
 import CategoryChips from "../../components/CategoryChips";
 import Header from "../../components/Header";
 import MovieCardCarousel from "../../components/MovieCardCarousel";
@@ -70,7 +69,7 @@ export default function HomeScreen() {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     if (tab === "explore") router.push("/screens/ExploreScreen");
-    if (tab === "settings") router.push("/screens/SettingsScreen");
+    if (tab === "favorites") router.push("/screens/FavoritesScreen");
     if (tab === "home") router.push("/screens/HomeScreen");
   };
 
@@ -87,7 +86,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <AppLayout activeTab={activeTab} onTabChange={handleTabChange}>
       <StatusBar barStyle="light-content" backgroundColor="#18181c" />
       <View style={styles.container}>
         <Header />
@@ -141,11 +140,8 @@ export default function HomeScreen() {
             />
           )}
         </View>
-        <View style={styles.bottomNavWrapper}>
-          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
-        </View>
       </View>
-    </SafeAreaView>
+    </AppLayout>
   );
 }
 

@@ -1,4 +1,4 @@
-import { Compass, Home, Settings } from "lucide-react-native";
+import { Compass, Heart, Home } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -19,9 +19,9 @@ const TABS = [
     icon: /* @ts-ignore */ <Compass color="#fff" stroke="#fff" size={24} />,
   },
   {
-    key: "settings",
-    label: "Settings",
-    icon: /* @ts-ignore */ <Settings color="#fff" stroke="#fff" size={24} />,
+    key: "favorites",
+    label: "Favorites",
+    icon: /* @ts-ignore */ <Heart color="#fff" stroke="#fff" size={24} />,
   },
 ];
 

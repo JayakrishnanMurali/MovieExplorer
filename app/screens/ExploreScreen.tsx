@@ -15,8 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import BottomNav from "../../components/BottomNav";
+import AppLayout from "../../components/AppLayout";
 import SearchBar, { SearchBarRef } from "../../components/SearchBar";
 
 const { width } = Dimensions.get("window");
@@ -154,12 +153,12 @@ export default function ExploreScreen() {
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     if (tab === "home") router.push("/screens/HomeScreen");
-    if (tab === "settings") router.push("/screens/SettingsScreen");
+    if (tab === "favorites") router.push("/screens/FavoritesScreen");
     if (tab === "explore") router.push("/screens/ExploreScreen");
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <AppLayout activeTab={activeTab} onTabChange={handleTabChange}>
       <View style={styles.container}>
         <SearchBar
           ref={searchBarRef}
@@ -207,9 +206,6 @@ export default function ExploreScreen() {
             }
           />
         )}
-        <View style={styles.bottomNavWrapper}>
-          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
-        </View>
         <GenreFilterSheet
           visible={filterModal}
           onClose={handleFilterClose}
@@ -218,7 +214,7 @@ export default function ExploreScreen() {
           sheetAnim={sheetAnim}
         />
       </View>
-    </SafeAreaView>
+    </AppLayout>
   );
 }
 

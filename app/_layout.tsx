@@ -29,9 +29,9 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="screens/SettingsScreen"
+          name="screens/FavoritesScreen"
           options={{
-            title: "Settings",
+            title: "Favorites",
             headerShown: false,
           }}
         />

@@ -3,9 +3,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ArrowLeft,
-  Bookmark,
   Download,
   ExternalLink,
+  Heart,
   Play,
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -19,11 +19,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useFavoritesStore } from "../../store/favoritesStore";
 import { getMovieDetailsSelector, useMovieStore } from "../../store/movieStore";
 
 const { width } = Dimensions.get("window");
 const POSTER_HEIGHT = width * 0.9;
-const BANNER_HEIGHT = width * 1.25;
 
 function getStars(rating: number) {
   const stars = [];
@@ -51,6 +51,9 @@ export default function MovieDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const isFavorite = useFavoritesStore((s) => s.isFavorite(movie?.id));
+  const addFavorite = useFavoritesStore((s) => s.addFavorite);
+  const removeFavorite = useFavoritesStore((s) => s.removeFavorite);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -297,8 +300,25 @@ export default function MovieDetailScreen() {
           >
             <ArrowLeft color="#fff" size={22} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn}>
-            <Bookmark color="#fff" size={22} />
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => {
+              if (isFavorite) {
+                removeFavorite(movie.id);
+              } else {
+                addFavorite({
+                  id: movie.id,
+                  title: movie.title,
+                  poster_path: movie.poster_path,
+                });
+              }
+            }}
+          >
+            {isFavorite ? (
+              <Heart color="#e74c3c" size={22} fill="#e74c3c" />
+            ) : (
+              <Heart color="#fff" size={22} />
+            )}
           </TouchableOpacity>
         </View>
         {/* Banner with blurred background and poster */}
