@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowLeft, Download, Heart, Play, Share2 } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
+  Platform,
   ScrollView,
   Share,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MovieBanner } from "../../components/movie/MovieBanner";
 import { MovieDetailSkeleton } from "../../components/movie/MovieDetailSkeleton";
 import { RecommendedMovies } from "../../components/movie/RecommendedMovies";
@@ -93,7 +94,7 @@ export default function MovieDetailScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 32 }}
@@ -184,8 +185,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 8,
-    marginBottom: 12,
+    paddingTop: Platform.OS === "android" ? 16 : 8,
+    paddingBottom: 12,
     paddingHorizontal: 16,
   },
   iconBtn: {
