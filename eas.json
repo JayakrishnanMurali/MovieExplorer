@@ -1,0 +1,40 @@
+{
+  "cli": {
+    "version": ">= 5.9.1"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "APP_ENV": "development",
+        "EXPO_PUBLIC_TMDB_API_KEY": "adecf34172ed2133906cb330e6a147fe",
+        "EXPO_PUBLIC_TMDB_BASE_URL": "https://api.themoviedb.org/3"
+      },
+      "prebuildCommand": "yarn install --frozen-lockfile"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_ENV": "preview",
+        "EXPO_PUBLIC_TMDB_API_KEY": "adecf34172ed2133906cb330e6a147fe",
+        "EXPO_PUBLIC_TMDB_BASE_URL": "https://api.themoviedb.org/3"
+      },
+      "prebuildCommand": "yarn install --frozen-lockfile"
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_TMDB_API_KEY": "adecf34172ed2133906cb330e6a147fe",
+        "EXPO_PUBLIC_TMDB_BASE_URL": "https://api.themoviedb.org/3"
+      },
+      "prebuildCommand": "yarn install --frozen-lockfile"
+    }
+  }
+}
