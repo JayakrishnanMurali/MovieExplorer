@@ -19,6 +19,7 @@ interface MovieStore {
   movies: Movie[];
   setMovies: (movies: Movie[]) => void;
   getMovieDetails: (id: number) => Promise<Movie | undefined>;
+  getRecommendedMovies: (id: number) => Promise<Movie[]>;
 }
 
 export const useMovieStore = create<MovieStore>((set) => ({
@@ -34,6 +35,16 @@ export const useMovieStore = create<MovieStore>((set) => ({
       return undefined;
     }
   },
+  getRecommendedMovies: async (id: number) => {
+    try {
+      const response = await axios.get(
+        `${TMDB_BASE_URL}/movie/${id}/recommendations?api_key=${TMDB_API_KEY}`
+      );
+      return response.data.results;
+    } catch (error) {
+      return [];
+    }
+  },
 }));
 
 // API endpoints
@@ -41,7 +52,12 @@ export const endpoints = {
   popular: `${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`,
   movieDetails: (id: number) =>
     `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}`,
+  recommendedMovies: (id: number) =>
+    `${TMDB_BASE_URL}/movie/${id}/recommendations?api_key=${TMDB_API_KEY}`,
 };
 
 export const getMovieDetailsSelector = (state: MovieStore) =>
   state.getMovieDetails;
+
+export const getRecommendedMoviesSelector = (state: MovieStore) =>
+  state.getRecommendedMovies;

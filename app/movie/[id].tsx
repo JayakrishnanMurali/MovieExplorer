@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   Dimensions,
+  FlatList,
   Image,
   SafeAreaView,
   ScrollView,
@@ -20,10 +21,16 @@ import {
   View,
 } from "react-native";
 import { useFavoritesStore } from "../../store/favoritesStore";
-import { getMovieDetailsSelector, useMovieStore } from "../../store/movieStore";
+import {
+  getMovieDetailsSelector,
+  getRecommendedMoviesSelector,
+  useMovieStore,
+} from "../../store/movieStore";
 
 const { width } = Dimensions.get("window");
 const POSTER_HEIGHT = width * 0.9;
+const CARD_WIDTH = (width - 56) / 2;
+const CARD_HEIGHT = CARD_WIDTH * 1.5;
 
 function getStars(rating: number) {
   const stars = [];
@@ -47,7 +54,9 @@ function getStars(rating: number) {
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams();
   const getMovieDetails = useMovieStore(getMovieDetailsSelector);
+  const getRecommendedMovies = useMovieStore(getRecommendedMoviesSelector);
   const [movie, setMovie] = useState<any>(null);
+  const [recommendedMovies, setRecommendedMovies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -56,17 +65,21 @@ export default function MovieDetailScreen() {
   const removeFavorite = useFavoritesStore((s) => s.removeFavorite);
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
+    const fetchMovieData = async () => {
       try {
-        const movieData = await getMovieDetails(Number(id));
+        const [movieData, recommendedData] = await Promise.all([
+          getMovieDetails(Number(id)),
+          getRecommendedMovies(Number(id)),
+        ]);
         setMovie(movieData);
+        setRecommendedMovies(recommendedData);
       } catch (err) {
         setError("Failed to load movie details");
       } finally {
         setLoading(false);
       }
     };
-    fetchMovieDetails();
+    fetchMovieData();
   }, [id]);
 
   if (loading) {
@@ -287,6 +300,27 @@ export default function MovieDetailScreen() {
     );
   }
 
+  const renderRecommendedMovie = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={styles.recommendedCard}
+      activeOpacity={0.9}
+      onPress={() => router.push(`/movie/${item.id}`)}
+    >
+      <Image
+        source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
+        style={styles.recommendedPoster}
+      />
+      <View style={styles.recommendedOverlay}>
+        <Text style={styles.recommendedMovieTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <Text style={styles.recommendedYear}>
+          {item.release_date ? new Date(item.release_date).getFullYear() : ""}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -378,6 +412,23 @@ export default function MovieDetailScreen() {
           <Text style={styles.watchBtnText}>Watch Now</Text>
         </TouchableOpacity>
         <Text style={styles.overview}>{movie.overview}</Text>
+
+        {/* Recommended Movies Section */}
+        {recommendedMovies.length > 0 && (
+          <View style={styles.recommendedSection}>
+            <Text style={styles.recommendedSectionTitle}>
+              Recommended Movies
+            </Text>
+            <FlatList
+              data={recommendedMovies}
+              renderItem={renderRecommendedMovie}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              scrollEnabled={false}
+              contentContainerStyle={styles.recommendedGrid}
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -543,5 +594,50 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 16,
+  },
+  recommendedSection: {
+    marginTop: 32,
+    paddingHorizontal: 16,
+  },
+  recommendedSectionTitle: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  recommendedGrid: {
+    gap: 16,
+    paddingHorizontal: 8,
+  },
+  recommendedCard: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#23232b",
+    marginHorizontal: 8,
+  },
+  recommendedPoster: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  recommendedOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    backgroundColor: "rgba(0,0,0,0.7)",
+  },
+  recommendedMovieTitle: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  recommendedYear: {
+    color: "#bbb",
+    fontSize: 12,
+    marginTop: 4,
   },
 });
