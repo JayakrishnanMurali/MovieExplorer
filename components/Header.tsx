@@ -11,7 +11,7 @@ export default function Header() {
           style={styles.avatar}
         />
         <View style={styles.greetingContainer}>
-          <Text style={styles.greeting}>Hi, Lucas!</Text>
+          <Text style={styles.greeting}>Hi, Guest!</Text>
           <Text style={styles.subtitle}>Find your favorite movie</Text>
         </View>
       </View>
