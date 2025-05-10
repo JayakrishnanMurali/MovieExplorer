@@ -4,6 +4,12 @@
     "slug": "MovieExplorer",
     "version": "1.0.0",
     "newArchEnabled": true,
+    "icon": "./assets/images/android-icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#18181c"
+    },
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -19,10 +25,16 @@
       }
     },
     "android": {
-      "package": "com.rollinsoul.MovieExplorer"
+      "package": "com.rollinsoul.MovieExplorer",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon.png",
+        "backgroundColor": "#18181c"
+      }
     },
     "ios": {
-      "bundleIdentifier": "com.rollinsoul.MovieExplorer"
+      "bundleIdentifier": "com.rollinsoul.MovieExplorer",
+      "supportsTablet": true,
+      "icon": "./assets/images/ios-icon.png"
     }
   }
 }

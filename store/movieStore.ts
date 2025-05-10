@@ -2,7 +2,7 @@ import { Movie } from "@/types/movie";
 import axios from "axios";
 import { create } from "zustand";
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 const TMDB_BASE_URL = process.env.EXPO_PUBLIC_TMDB_BASE_URL;
 
 interface MovieStore {

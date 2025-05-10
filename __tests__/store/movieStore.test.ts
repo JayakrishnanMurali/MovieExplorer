@@ -58,7 +58,7 @@ describe("movieStore", () => {
       const result = await useMovieStore.getState().getMovieDetails(1);
       expect(result).toEqual(mockMovie);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        `${process.env.EXPO_PUBLIC_TMDB_BASE_URL}/movie/1?api_key=${process.env.TMDB_API_KEY}`
+        `${process.env.EXPO_PUBLIC_TMDB_BASE_URL}/movie/1?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}`
       );
     });
 
@@ -92,7 +92,7 @@ describe("movieStore", () => {
       const result = await useMovieStore.getState().getRecommendedMovies(1);
       expect(result).toEqual(mockRecommendedMovies);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        `${process.env.EXPO_PUBLIC_TMDB_BASE_URL}/movie/1/recommendations?api_key=${process.env.TMDB_API_KEY}`
+        `${process.env.EXPO_PUBLIC_TMDB_BASE_URL}/movie/1/recommendations?api_key=${process.env.EXPO_PUBLIC_TMDB_API_KEY}`
       );
     });
 
