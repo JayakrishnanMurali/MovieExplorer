@@ -207,6 +207,9 @@ export default function ExploreScreen() {
             }
           />
         )}
+        <View style={styles.bottomNavWrapper}>
+          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
+        </View>
         <GenreFilterSheet
           visible={filterModal}
           onClose={handleFilterClose}
@@ -214,9 +217,6 @@ export default function ExploreScreen() {
           selectedGenre={selectedGenre}
           sheetAnim={sheetAnim}
         />
-        <View style={styles.bottomNavWrapper}>
-          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -341,65 +341,73 @@ function GenreFilterSheet({
 
   if (!visible) return null;
   return (
-    <Animated.View
-      style={[
-        styles.sheet,
-        {
-          transform: [
-            {
-              translateY: Animated.add(
-                sheetAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [480, 0],
-                }),
-                dragY
-              ),
-            },
-          ],
-        },
-      ]}
-    >
-      <View style={styles.sheetHandleArea} {...panResponder.panHandlers}>
-        <View style={styles.sheetHandle} />
-      </View>
-      <Text style={styles.modalTitle}>Select Genre</Text>
-      <View style={styles.sheetListContainer}>
-        <FlatList
-          data={[{ id: 0, name: "All" }, ...GENRE_LIST]}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.genreOption,
-                selectedGenre === item.id && styles.genreOptionSelected,
-              ]}
-              onPress={() => onSelect(item.id)}
-            >
-              <Text
+    <>
+      {/* Modal overlay to catch outside clicks */}
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+      <Animated.View
+        style={[
+          styles.sheet,
+          {
+            transform: [
+              {
+                translateY: Animated.add(
+                  sheetAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [480, 0],
+                  }),
+                  dragY
+                ),
+              },
+            ],
+          },
+        ]}
+      >
+        <View style={styles.sheetHandleArea} {...panResponder.panHandlers}>
+          <View style={styles.sheetHandle} />
+        </View>
+        <Text style={styles.modalTitle}>Select Genre</Text>
+        <View style={styles.sheetListContainer}>
+          <FlatList
+            data={[{ id: 0, name: "All" }, ...GENRE_LIST]}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
                 style={[
-                  styles.genreOptionText,
-                  selectedGenre === item.id && styles.genreOptionTextSelected,
+                  styles.genreOption,
+                  selectedGenre === item.id && styles.genreOptionSelected,
                 ]}
+                onPress={() => onSelect(item.id)}
               >
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          )}
-          ListHeaderComponent={<View style={{ height: 8 }} />}
-          contentContainerStyle={{ paddingBottom: 24 }}
-          style={{ flex: 1 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        />
-      </View>
-      <TouchableOpacity style={styles.sheetCloseBtn} onPress={onClose}>
-        <Text
-          style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}
-        >
-          Close
-        </Text>
-      </TouchableOpacity>
-    </Animated.View>
+                <Text
+                  style={[
+                    styles.genreOptionText,
+                    selectedGenre === item.id && styles.genreOptionTextSelected,
+                  ]}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            )}
+            ListHeaderComponent={<View style={{ height: 8 }} />}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          />
+        </View>
+        <TouchableOpacity style={styles.sheetCloseBtn} onPress={onClose}>
+          <Text
+            style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}
+          >
+            Close
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </>
   );
 }
 
@@ -545,12 +553,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
+    top: 0,
     bottom: 0,
     backgroundColor: "#23232b",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
-    minHeight: 480,
     elevation: 20,
     zIndex: 100,
   },
@@ -577,7 +585,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   sheetListContainer: {
-    maxHeight: 320,
     flex: 1,
   },
   sheetHandleArea: {
